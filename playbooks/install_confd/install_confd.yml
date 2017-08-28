@@ -1,0 +1,50 @@
+---
+- name: 安装confd服务
+  become: yes
+  become_user: root
+  become_method: sudo
+  gather_facts: True
+  hosts: "{{ proj_id }}"
+  vars:
+    exec_cmd: confd
+    etcd_server: 192.168.2.201
+    etcd_port: 2379
+
+  tasks:
+    - name: Install python bindings for SE Linux
+      yum: name={{ item }} state=present
+      with_items:
+        - libselinux-python
+        - libsemanage-python
+
+    - name: 拷贝confd至远程目录
+      copy:
+        src: "{{ item }}"
+        dest: /usr/sbin/
+        owner: root
+        group: root
+        mode: 0755
+      with_items:
+        - confd
+
+    - name: 创建配置目录
+      shell: mkdir -p "{{ item }}"
+      with_items:
+        - /etc/confd/conf.d
+        - /etc/confd/templates
+
+    - name: 拷贝配置文件至远程目录
+      template: 
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: 0755
+      with_items:
+        - { src: "cron.conf.toml.j2", dest: "/etc/confd/conf.d/cron.conf.toml" }
+        - { src: "cron.conf.tmpl.j2", dest: "/etc/confd/templates/cron.conf.tmpl" }
+
+    - name: 启动confd
+      shell: '{{ exec_cmd }} -watch -backend etcd -node http://{{ etcd_server }}:{{ etcd_port }} >/dev/null 2>&1 &'
+      async: 5
+      poll: 0

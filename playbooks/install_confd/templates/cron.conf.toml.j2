@@ -1,0 +1,9 @@
+{% raw %}[template]
+src = "cron.conf.tmpl"
+dest = "/etc/cron.d/taskfortestserver"
+keys = [
+{% endraw %}
+{% raw %}    "/taskmanager/{% endraw %}{{ ansible_hostname }}{% raw %}"
+]
+reload_cmd = "service crond reload"
+{% endraw %}
