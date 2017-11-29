@@ -29,8 +29,7 @@
         dest: "{{ python_download_dest }}"
 
     - name: 解压源码文件，并在远程主机上安装Python
-      shell: cd {{ python_download_dest }} && tar -xzf {{ python_file_name }} && cd {{ python_file_prefix_name }} && ./configure --prefix={{
-python_install_dir }} && make && make install
+      shell: cd {{ python_download_dest }} && tar -xzf {{ python_file_name }} && cd {{ python_file_prefix_name }} && ./configure --prefix={{python_install_dir }} && make && make install
 
     - name: 安装指定的python模块
       shell: "{{ python_pip_path }} install {{ item }}"
