@@ -1,0 +1,18 @@
+---
+- name: 安装python环境
+  become: yes
+  become_user: root
+  become_method: sudo
+  gather_facts: True
+  hosts: "{{ python_id }}"
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Show some variables info
+      debug: var={{ item }} verbosity=0
+      with_items:
+        - python_version
+        - python_pip_path
+        - python_install_dir
+        - ansible_os_family

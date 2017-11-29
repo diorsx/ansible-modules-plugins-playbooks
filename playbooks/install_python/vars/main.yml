@@ -1,0 +1,11 @@
+---
+python_id: "{{ proj_id | default('testserver') }}"
+python_version: "{{ version | default(2.7)  }}"
+python_file_prefix_name: "Python-{{ python_version }}"
+python_download_url: "https://www.python.org/ftp/python/{{ python_version }}/{{ python_file_prefix_name }}.tgz"
+python_download_dest: "{{ download_dest | default('/tmp') }}"
+python_default_install_dir: /usr/local/python-{{ python_version }}
+python_install_dir: "{{ proj_dir | default(python_default_install_dir) }}"
+python_file_name: "{{ python_file_prefix_name }}.tgz"
+python_pip_path: "{{ python_install_dir }}/bin/{%- if  python_version < '3' -%} pip {%- else -%} pip3 {%- endif -%}"
+python_log_path: /var/log/install_python.log

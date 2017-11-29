@@ -1,0 +1,41 @@
+---
+- name: 部署python环境
+  become: yes
+  become_user: root
+  become_method: sudo
+  gather_facts: True
+  hosts: "{{ python_id }}"
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Install python bindings for SE Linux
+      yum: name={{ item }} state=present
+      with_items:
+        - libselinux-python
+        - libsemanage-python
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install python bindings for SE Linux
+      apt: name={{ item }} state=present
+      with_items:
+        - libselinux-python
+        - libsemanage-python
+      when: ansible_os_family == 'Debian'
+
+    - name: "下载{{ python_file_prefix_name }}源码文件"
+      get_url:
+        url: "{{ python_download_url }}"
+        dest: "{{ python_download_dest }}"
+
+    - name: 解压源码文件，并在远程主机上安装Python
+      shell: cd {{ python_download_dest }} && tar -xzf {{ python_file_name }} && cd {{ python_file_prefix_name }} && ./configure --prefix={{
+python_install_dir }} && make && make install
+
+    - name: 安装指定的python模块
+      shell: "{{ python_pip_path }} install {{ item }}"
+      with_items:
+        - pulp
+        - pandas
+        - numpy
+      ignore_errors: True
